@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>铭记历史 砥砺前行——圆明园军事实践感悟</title>
+    <!-- 引入必要的CDN资源 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --primary-light: #ffffff;
+            --accent-red: #ff3333;
+            --accent-gold: #ffd700;
+            --accent-dark-red: #8b0000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--primary-dark);
+            color: var(--primary-light);
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, rgba(139, 0, 0, 0.1) 0%, transparent 100%),
+                radial-gradient(circle at top right, rgba(255, 51, 51, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-red), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            text-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 51, 51, 0.3); }
+            50% { text-shadow: 0 0 30px rgba(255, 51, 51, 0.6); }
+        }
+
+        .date {
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 51, 51, 0.1);
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.1);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-red));
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--accent-red);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 5px;
+            height: 25px;
+            background: var(--accent-red);
+            margin-right: 1rem;
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            line-height: 1.8;
+            text-align: justify;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            color: #f0f0f0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem;
+            background: rgba(139, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 51, 51, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--accent-red) 50%,
+                transparent 100%);
+            animation: footerGlow 3s linear infinite;
+        }
+
+        @keyframes footerGlow {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(25%); }
+        }
+
+        .author {
+            font-size: 1rem;
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        /* 鼠标跟随效果 */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-red);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transition: all 0.1s ease;
+            z-index: 9999;
+        }
+
+        .image-container {
+            margin: 2rem -2rem;
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        /* 为所有图片添加基础样式 */
+        .section-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(30%) contrast(110%) brightness(90%) sepia(20%);
+            transition: all 0.8s ease;
+        }
+
+        /* 为第一张图片添加创意红旗遮挡 */
+        .section[data-section="see"] .image-container::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 60%;
+            height: 140%;
+            background: var(--accent-dark-red);
+            transform-origin: right center;
+            transform: skewX(-15deg);
+            animation: flagWave 6s ease-in-out infinite;
+            z-index: 3;
+            box-shadow: -5px 0 15px rgba(139, 0, 0, 0.5);
+        }
+
+        /* 添加金色五角星 */
+        .section[data-section="see"] .image-container::after {
+            content: '★';
+            position: absolute;
+            top: 25%;
+            right: 25%;
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            z-index: 4;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+            animation: starShine 3s ease-in-out infinite;
+        }
+
+        @keyframes flagWave {
+            0%, 100% {
+                transform: skewX(-15deg) translateX(0);
+            }
+            50% {
+                transform: skewX(-20deg) translateX(-10px);
+            }
+        }
+
+        @keyframes starShine {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        /* 添加红旗褶皱效果 */
+        .section[data-section="see"] .image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section[data-section="see"] .image-container::before {
+            background: linear-gradient(
+                45deg,
+                var(--accent-dark-red) 0%,
+                #cc0000 40%,
+                var(--accent-dark-red) 100%
+            );
+        }
+
+        /* 移除多余的overlay div */
+        .section[data-section="see"] .overlay {
+            display: none;
+        }
+
+        /* 其他图片的红色氛围效果 */
+        .section:not([data-section="see"]) .image-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(139, 0, 0, 0.7) 0%,
+                rgba(10, 10, 10, 0.3) 50%,
+                rgba(139, 0, 0, 0.7) 100%
+            );
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* 只对非第一张图片应用悬停效果 */
+        .section:not(:first-of-type):hover .section-image {
+            transform: scale(1.05);
+            filter: grayscale(0%) contrast(120%) brightness(100%) sepia(10%);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .cursor {
+                display: none;
+            }
+
+            .image-container {
+                height: 200px;
+                margin: 1rem -1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="cursor"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">铭记历史 砥砺前行——圆明园军事实践感悟</h1>
+            <div class="date">2025年4月18日</div>
+        </header>
+
+        <section class="section" data-section="intro">
+            <p class="content">
+                踏入圆明园的那一刻，春日的阳光洒在斑驳的断壁上，眼前的景象瞬间将我从现代拉回那段沉重的历史。残存的石柱如倔强的脊梁，矗立在荒草间，每一道裂痕都在无声地控诉着1860年的那场浩劫。
+            </p>
+        </section>
+
+        <section class="section" data-section="see">
+            <h2 class="section-title">所见：废墟中的文明伤痕</h2>
+            <div class="image-container">
+                <div class="overlay"></div>
+                <img src="images/yuanmingyuan1.jpg" alt="圆明园西洋楼遗址" class="section-image">
+            </div>
+            <p class="content">
+                西洋楼遗址前，我凝视着大水法仅存的基座。导游提到，这里曾有一座融合中西技艺的喷泉，十二生肖铜像喷水报时，如今只剩几根雕刻精美的石柱孤独伫立。抚摸那些被烟熏火燎过的纹路，指尖传来的粗粝感仿佛在提醒：文明的毁灭只需一瞬，重建却需百年。远处，湖面倒映着残破的拱门，水波荡漾间，仿佛映出昔日的金碧辉煌与今日的满目疮痍。
+            </p>
+        </section>
+
+        <section class="section" data-section="think">
+            <h2 class="section-title">所思：屈辱与觉醒的双重烙印</h2>
+            <div class="image-container">
+                <img src="images/yuanmingyuan2.jpg" alt="圆明园历史图片对比" class="section-image">
+            </div>
+            <p class="content">
+                站在废墟中，我突然理解了"落后就要挨打"的残酷真理。圆明园曾是"万园之园"，凝聚着无数工匠的智慧，却因清政府的闭锁与羸弱，在侵略者的铁蹄下化为焦土。那些被掠走的文物，至今散落异国，成为民族记忆的裂痕。但更刺痛我的，是历史课本上轻描淡写的"火烧圆明园"在此刻变得如此具象——它不是一段遥远的文字，而是烙在民族血脉中的警示。
+            </p>
+        </section>
+
+        <section class="section" data-section="understand">
+            <h2 class="section-title">所悟：强军与自强的时代使命</h2>
+            <div class="image-container">
+                <img src="images/yuanmingyuan3.jpg" alt="现代军事力量" class="section-image">
+            </div>
+            <p class="content">
+                作为军事理论课的实践者，我比以往更深刻体会到国防的意义。圆明园的悲剧，始于军事的落后与思想的僵化。今日的中国早已不是任人宰割的羔羊，但国际局势风云变幻，唯有居安思危，方能避免历史重演。离园时，夕阳为废墟镀上一层金色，我默默攥紧拳头：吾辈当以知识为盾，以信念为矛，守护这来之不易的和平盛世。
+            </p>
+        </section>
+
+        <section class="section" data-section="conclusion">
+            <h2 class="section-title">结语</h2>
+            <div class="image-container">
+                <img src="images/yuanmingyuan4.jpg" alt="圆明园夕阳" class="section-image">
+            </div>
+            <p class="content">
+                圆明园不需要复刻的奢华，它存在的意义，正是以残缺之躯告诫后人：尊严源于实力，和平依托自强。离园时，风过林梢，沙沙声如历史的低语——勿忘过去，但请向前。
+            </p>
+        </section>
+
+        <footer class="footer">
+            <p class="author">作者：oliver & 吕</p>
+        </footer>
+    </div>
+
+    <script>
+        // 粒子效果配置
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: '#ff3333' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#8b0000',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'repulse' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                },
+                modes: {
+                    repulse: { distance: 100, duration: 0.4 },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // 页面加载动画
+        window.addEventListener('load', () => {
+            gsap.to('.container', {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: 'power2.out'
+            });
+
+            gsap.utils.toArray('.section').forEach((section, i) => {
+                gsap.to(section, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    delay: 0.2 * i,
+                    ease: 'power2.out'
+                });
+            });
+        });
+
+        // 鼠标跟随效果
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // 滚动触发动画
+        const sections = document.querySelectorAll('.section');
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.style.opacity = '1';
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html> 
